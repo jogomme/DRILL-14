@@ -29,4 +29,15 @@ class Bird:
         pass
 
     def draw(self):
-        pass
+        frame_index = int(self.frame) % FRAME_COUNT
+        row, column = divmod(frame_index, FRAMES_PER_ROW)
+        left = column * FRAME_WIDTH
+        top = row * FRAME_HEIGHT
+        width = min(FRAME_WIDTH, Bird.image.w - left)
+        height = min(FRAME_HEIGHT, Bird.image.h - top)
+        bottom = Bird.image.h - top - height
+
+        Bird.image.clip_draw(
+            left, bottom, width, height,
+            self.x, self.y, DRAW_WIDTH, DRAW_HEIGHT
+        )
