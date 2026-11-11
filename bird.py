@@ -15,7 +15,18 @@ DRAW_HEIGHT = 85
 class Bird:
     image = None
 
-    def __init__(self, x, y, speed=0.0, direction=1, frame=0.0):
+    def __init__(
+        self, x, y, speed=0.0, direction=1, frame=0.0,
+        left_bound=None, right_bound=None
+    ):
+        if direction not in (-1, 1):
+            raise ValueError('direction must be -1 or 1')
+        if speed < 0:
+            raise ValueError('speed must not be negative')
+        if (left_bound is not None and right_bound is not None and
+                right_bound <= left_bound):
+            raise ValueError('right_bound must be greater than left_bound')
+
         if Bird.image is None:
             Bird.image = load_image(SPRITE_PATH)
 
@@ -23,7 +34,13 @@ class Bird:
         self.y = float(y)
         self.speed = float(speed)
         self.direction = direction
-        self.frame = float(frame)
+        self.frame = float(frame) % FRAME_COUNT
+        self.left_bound = (
+            DRAW_WIDTH / 2 if left_bound is None else float(left_bound)
+        )
+        self.right_bound = (
+            None if right_bound is None else float(right_bound)
+        )
 
     def update(self):
         self.frame = (
