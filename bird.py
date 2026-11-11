@@ -26,7 +26,9 @@ class Bird:
         self.frame = float(frame)
 
     def update(self):
-        pass
+        self.frame = (
+            self.frame + ANIMATION_FPS * game_framework.frame_time
+        ) % FRAME_COUNT
 
     def draw(self):
         frame_index = int(self.frame) % FRAME_COUNT
