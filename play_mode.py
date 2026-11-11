@@ -29,7 +29,6 @@ def init():
     global boy, birds
 
     boy = Boy()
-    game_world.add_oject(boy)
 
     grass = Grass()
     game_world.add_oject(grass, 0)
@@ -53,6 +52,7 @@ def init():
         )
         birds.append(bird)
         game_world.add_oject(bird)
+    game_world.add_oject(boy)
 
 
 def pause():
@@ -77,7 +77,6 @@ def render():
     clear_canvas()
     game_world.render()
     update_canvas()
-
 
 
 
