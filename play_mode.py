@@ -5,7 +5,7 @@ from bird import Bird, DRAW_HEIGHT, DRAW_WIDTH, FRAME_COUNT
 from boy import Boy
 from grass import Grass
 
-BIRD_COUNT = 1
+BIRD_COUNT = 10
 
 boy = None
 birds = []
@@ -36,18 +36,22 @@ def init():
 
     left_bound = DRAW_WIDTH / 2
     right_bound = get_canvas_width() - DRAW_WIDTH / 2
-    birds = [
-        Bird(
-            get_canvas_width() / 2,
-            get_canvas_height() - DRAW_HEIGHT / 2,
-            speed=90.0,
-            direction=1,
-            frame=0.0,
+    lane_count = max(1, int(get_canvas_height() / (DRAW_HEIGHT * 1.5)))
+    lane_spacing = get_canvas_height() / (lane_count + 1)
+    flight_width = right_bound - left_bound
+    birds = []
+
+    for index in range(BIRD_COUNT):
+        bird = Bird(
+            left_bound + flight_width * (index + 0.5) / BIRD_COUNT,
+            lane_spacing * (index % lane_count + 1),
+            speed=80.0 + (index % 4) * 15.0,
+            direction=1 if index % 2 == 0 else -1,
+            frame=FRAME_COUNT * index / BIRD_COUNT,
             left_bound=left_bound,
             right_bound=right_bound,
         )
-    ]
-    for bird in birds:
+        birds.append(bird)
         game_world.add_oject(bird)
 
 
@@ -73,7 +77,6 @@ def render():
     clear_canvas()
     game_world.render()
     update_canvas()
-
 
 
 
