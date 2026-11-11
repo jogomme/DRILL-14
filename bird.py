@@ -1,5 +1,5 @@
 import game_framework
-from pico2d import load_image
+from pico2d import get_canvas_width, load_image
 
 
 SPRITE_PATH = 'bird_animation.png'
@@ -43,9 +43,34 @@ class Bird:
         )
 
     def update(self):
+        dt = game_framework.frame_time
+        if dt < 0:
+            raise ValueError('frame_time must not be negative')
+
         self.frame = (
-            self.frame + ANIMATION_FPS * game_framework.frame_time
+            self.frame + ANIMATION_FPS * dt
         ) % FRAME_COUNT
+        right_bound = (
+            get_canvas_width() - DRAW_WIDTH / 2
+            if self.right_bound is None else self.right_bound
+        )
+        span = right_bound - self.left_bound
+        if span <= 0:
+            raise ValueError('flight bounds must leave room for the bird')
+
+        position = min(max(self.x, self.left_bound), right_bound)
+        phase = (
+            position - self.left_bound
+            if self.direction > 0 else
+            2 * span - (position - self.left_bound)
+        )
+        phase = (phase + self.speed * dt) % (2 * span)
+        if phase < span:
+            self.x = self.left_bound + phase
+            self.direction = 1
+        else:
+            self.x = right_bound - (phase - span)
+            self.direction = -1
 
     def draw(self):
         frame_index = int(self.frame) % FRAME_COUNT
@@ -56,7 +81,8 @@ class Bird:
         height = min(FRAME_HEIGHT, Bird.image.h - top)
         bottom = Bird.image.h - top - height
 
-        Bird.image.clip_draw(
-            left, bottom, width, height,
+        flip = 'h' if self.direction < 0 else ''
+        Bird.image.clip_composite_draw(
+            left, bottom, width, height, 0, flip,
             self.x, self.y, DRAW_WIDTH, DRAW_HEIGHT
         )
